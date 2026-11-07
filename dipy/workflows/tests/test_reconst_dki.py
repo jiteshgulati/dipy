@@ -114,6 +114,7 @@ def test_reconst_dki(tmp_path):
     assert_allclose(pam.peak_dirs.reshape(peaks_dir_data.shape), peaks_dir_data)
     assert_allclose(pam.peak_values, peaks_vals_data)
     assert_allclose(pam.peak_indices, peaks_idx_data)
+    assert_allclose(pam.peak_dirs[..., 0, :], evecs_data[..., :, 0])
 
     bvals, bvecs = read_bvals_bvecs(bval_path, bvec_path)
     bvals[0] = 5.0

@@ -128,6 +128,7 @@ def reconst_flow_core(
     assert_allclose(pam.peak_dirs.reshape(peaks_dir_data.shape), peaks_dir_data)
     assert_allclose(pam.peak_values, peaks_vals_data)
     assert_allclose(pam.peak_indices, peaks_idx_data)
+    assert_allclose(pam.peak_dirs[..., 0, :], evecs_data[..., :, 0])
 
 
 def simulate_multitensor_data(gtab):
@@ -143,7 +144,7 @@ def simulate_multitensor_data(gtab):
                 gtab,
                 mevals,
                 S0=100,
-                angles=[(90, 0), (90, 0)],
+                angles=[(60, 30), (60, 30)],
                 fractions=[(1 - gtf) * 100, gtf * 100],
                 snr=None,
             )
@@ -213,3 +214,7 @@ def test_fwdti(tmp_path):
         out_path = fwdti_flow.last_generated_outputs[out_name]
         out_data = load_nifti_data(out_path)
         assert_greater(out_data.mean(), 0)
+
+    evecs_data = load_nifti_data(fwdti_flow.last_generated_outputs["out_evec"])
+    pam = load_pam(fwdti_flow.last_generated_outputs["out_pam"])
+    assert_allclose(pam.peak_dirs[..., 0, :], evecs_data[..., :, 0])

@@ -396,13 +396,13 @@ def tensor_to_pam(
     npeaks = min(npeaks, evals.shape[-1])
     shape = evals.shape[:3]
     peaks_dirs = np.zeros(shape + (npeaks, 3))
-    peaks_dirs[..., :npeaks, :] = evecs[..., :npeaks, :]
+    peaks_dirs[..., :npeaks, :] = np.swapaxes(evecs, -1, -2)[..., :npeaks, :]
     peaks_values = np.zeros(shape + (npeaks,))
     peaks_values[..., :npeaks] = evals[..., :npeaks]
 
     if generate_peaks_indices:
         vertices = sphere.vertices if sphere else None
-        peaks_indices = quantize_evecs(evecs[..., :npeaks, :], odf_vertices=vertices)
+        peaks_indices = quantize_evecs(evecs[..., :, :npeaks], odf_vertices=vertices)
     else:
         peaks_indices = np.zeros((shape + (npeaks,)), dtype="int")
         peaks_indices.fill(-1)

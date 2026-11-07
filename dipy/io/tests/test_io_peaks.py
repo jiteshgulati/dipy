@@ -16,6 +16,7 @@ from dipy.io.peaks import (
     tensor_to_pam,
 )
 import dipy.reconst.dti as dti
+from dipy.sims.voxel import all_tensor_evecs
 from dipy.testing.decorators import set_random_number_generator
 
 
@@ -208,3 +209,24 @@ def test_tensor_to_pam(tmp_path):
     npt.assert_array_equal(pam.peak_dirs, pam2.peak_dirs)
     npt.assert_array_almost_equal(pam.peak_indices, pam2.peak_indices)
     del pam
+
+
+def test_tensor_to_pam_peak_dirs():
+    shape = (2, 3, 4)
+    evecs = all_tensor_evecs(np.array([0.48, 0.6, 0.64]))
+    evals = np.tile([1.7e-3, 0.5e-3, 0.2e-3], shape + (1,))
+
+    for npeaks in (3, 2, 1):
+        pam = tensor_to_pam(
+            evals,
+            np.tile(evecs, shape + (1, 1)),
+            np.eye(4),
+            sphere=default_sphere,
+            npeaks=npeaks,
+        )
+        npt.assert_array_almost_equal(
+            pam.peak_dirs, np.broadcast_to(evecs.T[:npeaks], shape + (npeaks, 3))
+        )
+        npt.assert_array_equal(
+            pam.peak_indices, np.argmax(default_sphere.vertices @ evecs[:, 0])
+        )

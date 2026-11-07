@@ -608,7 +608,9 @@ def test_tensor_to_pam_flow(tmp_path):
 
     pam = load_pam(pam_file)
     npt.assert_array_equal(pam.affine, affine)
-    npt.assert_array_almost_equal(pam.peak_dirs[..., :3, :], df.evecs)
+    npt.assert_array_almost_equal(
+        pam.peak_dirs[..., :3, :], np.swapaxes(df.evecs, -1, -2)
+    )
     npt.assert_array_almost_equal(pam.peak_values[..., :3], df.evals)
 
 
